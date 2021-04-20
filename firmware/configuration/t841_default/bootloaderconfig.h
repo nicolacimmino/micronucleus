@@ -264,4 +264,12 @@
 #define POSTSCRIPT_SIZE 6
 #define PROGMEM_SIZE (BOOTLOADER_ADDRESS - POSTSCRIPT_SIZE) /* max size of user program */
 
+/*
+ * If SECURE_BOOT is enabled the bootloader will erase the application as soon as it enters.
+ * SECURE_BOOT cannot be enabled unless entry mode is ENTRY_JUMPER otherwise the application
+ * would be deleted at every start
+ */
+
+// #define SECURE_BOOT
+
 #endif /* __bootloader_h_included__ */

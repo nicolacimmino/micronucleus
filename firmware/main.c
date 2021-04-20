@@ -83,6 +83,10 @@
 #warning "Values below 120 ms are not possible for FAST_EXIT_NO_USB_MS"
 #endif
 
+#if ((defined SECURE_BOOT) && (ENTRYMODE!=ENTRY_JUMPER))
+#error "Do not set SECURE_BOOT without ENTRYMODE=ENTRY_JUMPER, your application will be erased at every reset"
+#endif
+
 // Device configuration reply
 // Length: 6 bytes
 //   Byte 0:  User program memory size, high byte
@@ -401,6 +405,10 @@ int main(void) {
         command = cmd_local_nop; // initialize register 3
         currentAddress.w = 0;
 
+#ifdef SECURE_BOOT            
+        eraseApplication();
+#endif
+
         /*
          * 1. Wait for 5 ms or USB transmission (and detect reset)
          * 2. Interpret and execute USB command
@@ -474,9 +482,13 @@ int main(void) {
             /*
              * command is only evaluated here and set by usbFunctionSetup()
              */
+            
+            // In SECURE_BOOT we erased already the application on entry, ignore command here, save bytes and time
+#ifndef SECURE_BOOT            
             if (command == cmd_erase_application) {
                 eraseApplication();
             }
+#endif            
             if (command == cmd_write_page) {
                 writeFlashPage();
             }
